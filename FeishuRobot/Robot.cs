@@ -25,7 +25,7 @@ namespace FeishuRobot
         private const string secret = "nmhkJtm32yeibZPLkfdiUh";
         private const string msgType = "text";
         private const string text = "100! =";
-        
+
         private HttpClient client;
         private HttpClient weatherClient;
 
@@ -62,7 +62,7 @@ namespace FeishuRobot
                 //    SendWeatherMessage();
                 //    newDay = false;
                 //}
-                
+
                 if (Check())
                 {
                     var t = DrinkingText();
@@ -70,7 +70,7 @@ namespace FeishuRobot
                     Console.WriteLine(message);
                     SendMessage(message);
                 }
-                Thread.Sleep(1000 * 60);
+                Task.Delay(TimeSpan.FromMinutes(1)).Wait();
             }
         }
 
@@ -89,7 +89,7 @@ namespace FeishuRobot
                 return false;
             }
 
-            if (CheckTime(DateTime.Now,9,30,10,30)) // 9:30-10:30
+            if (CheckTime(DateTime.Now, 9, 30, 10, 30)) // 9:30-10:30
             {
                 return true;
             }
@@ -104,7 +104,7 @@ namespace FeishuRobot
                 return false;
             }
 
-            if (CheckTime(DateTime.Now,0,0,0,2))    // 当前时间在00:00-00:02之间认为新的一天到了
+            if (CheckTime(DateTime.Now, 0, 0, 0, 2))    // 当前时间在00:00-00:02之间认为新的一天到了
             {
                 return true;
             }
@@ -130,16 +130,16 @@ namespace FeishuRobot
         public async Task<string> DrinkingText()
         {
             string txt = "提醒喝水小助手:\n现在是" + DateTime.Now.Hour + "点\n" +
-                            $"距离下班还有{GetRemainTime(DateTime.Now,new DateTime(DateTime.Now.Year,DateTime.Now.Month,DateTime.Now.Day,18,30,0))}分钟,坚持住,打工人!\n"+
+                            $"距离下班还有{GetRemainTime(DateTime.Now, new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 18, 30, 0))}分钟,坚持住,打工人!\n" +
                           "工作再忙也要记得挺直腰杆多喝热水哦!\n<at user_id=\"all\">小伙子们！</at>\n\n";
             var data = new StringContent("{}", Encoding.UTF8, "application/json");
             var response = await client.PostAsync(randomSentenceUrl, data);
             var responseString = await response.Content.ReadAsStringAsync();
-             JsonConvert.DeserializeObject(responseString);
+            JsonConvert.DeserializeObject(responseString);
             var jsonData = JsonMapper.ToObject(responseString);
             var sentence = jsonData["hitokoto"];
             var from = jsonData["from"];
-            txt += sentence + "----"+ from + "\n";
+            txt += sentence + "----" + from + "\n";
             return txt;
         }
 
@@ -151,7 +151,7 @@ namespace FeishuRobot
             var cityContent = response.Content.ReadAsStringAsync().Result;
             var cityData = JsonMapper.ToObject(cityContent);
             var id = cityData["location"][0]["id"];
-            string targetWeatherUrl = weatherUrl + "location=" +id+"&key=" + weatherKey;
+            string targetWeatherUrl = weatherUrl + "location=" + id + "&key=" + weatherKey;
             response = await weatherClient.GetAsync(targetWeatherUrl);
             var weatherContent = response.Content.ReadAsStringAsync().Result;
 
@@ -185,7 +185,7 @@ namespace FeishuRobot
         public bool Check()
         {
             // 是否在一定时间范围内
-            if (CheckTime(DateTime.Now,9,30,18,30))
+            if (CheckTime(DateTime.Now, 9, 30, 18, 30))
             {
                 // 是否是整点
                 return DateTime.Now.Minute == 0;
@@ -218,7 +218,7 @@ namespace FeishuRobot
             var response = await client.GetAsync(targetUrl);
             var content = response.Content.ReadAsStringAsync().Result;
             Console.WriteLine(content);
-            var dayInfo =  JsonMapper.ToObject(content);
+            var dayInfo = JsonMapper.ToObject(content);
             var code = dayInfo["code"];
             if (((int)code) != 0)
             {
@@ -232,7 +232,7 @@ namespace FeishuRobot
             return false;
         }
 
-        public bool CheckTime(DateTime time,int startHour, int startMinute, int endHour,int endMinute)
+        public bool CheckTime(DateTime time, int startHour, int startMinute, int endHour, int endMinute)
         {
             if (time.Hour == startHour)
             {
@@ -247,7 +247,7 @@ namespace FeishuRobot
 
         public string GetRemainTime(DateTime time1, DateTime time2)
         {
-            return (time2 - time1).TotalMinutes.ToString();
+            return ((int)(time2 - time1).TotalMinutes).ToString();
         }
     }
 }
