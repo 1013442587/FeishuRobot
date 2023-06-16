@@ -185,7 +185,7 @@ namespace FeishuRobot
         public bool Check()
         {
             // 是否在一定时间范围内
-            if (CheckTime(DateTime.Now, 9, 30, 18, 30))
+            if (CheckTime(DateTime.Now, 9, 30, 19, 0))
             {
                 // 是否是整点
                 return DateTime.Now.Minute == 0;
